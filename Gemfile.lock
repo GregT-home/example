@@ -1,0 +1,24 @@
+GEM
+  specs:
+    clipboard (1.0.5)
+    coderay (1.1.0)
+    interception (0.5)
+    method_source (0.8.2)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    pry-clipboard (0.1.1)
+      clipboard
+      pry
+    pry-rescue (1.4.1)
+      interception (>= 0.5)
+      pry
+    slop (3.6.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  pry-clipboard
+  pry-rescue
