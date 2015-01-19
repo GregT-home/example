@@ -114,6 +114,7 @@ end
 if opts[:formatador]
   require 'formatador'
   #require '../../formatador/lib/formatador'
+
   def loop_color(index, bg: false)
     colors = %w[ red green yellow blue magenta purple cyan white
                  light_black light_red light_green light_yellow light_blue
@@ -127,6 +128,7 @@ if opts[:formatador]
     "[/]"
   end
 
+  # build a colorful tag line
   tag = "In vibrant living colors"
   in_living_color = tag.length.times.map { |i| "#{loop_color(i)}#{tag[i]}" }.join + color_end
 
@@ -138,7 +140,25 @@ if opts[:formatador]
 
   colored_list = text_list.length.times.map { |i| "#{loop_color(i)}#{text_list[i]}" }.join(' ') + color_end
   f.display_line *colored_list
-  
+
+  f.display_line "And"
+  f.indent {
+    f.display_line "with"
+    f.indent {
+      f.display_line "varying"
+      f.indent {
+        f.display_line "levels"
+        f.indent {
+          f.display_line "of"
+          f.indent {
+            f.display_line "indentation"
+          }
+        }
+      }
+    }
+  }
+  f.display_line
+
   f.display_line "#display displays a raw line, optionally #{in_living_color}"
   f.display *colored_list; nl_added
 
@@ -156,12 +176,12 @@ if opts[:formatador]
   pbar = Formatador::ProgressBar.new(total)
   total.times do |i|
     pbar.increment
-    sleep 1.0/(i + 1)
+    sleep 0.5/(i + 1)
   end
 
   f.display_line "And Tables..."
-  table = Formatador::display_table([opts])
+  f.display_table([opts])   # display opts hash 'as-is'
+  f.display_table( opts.map  { |o,v| {option: "#{o}", value: "#{v}"}})  # reformat as "option/value"
 
   separator
 end
-
