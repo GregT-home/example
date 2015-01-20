@@ -2,12 +2,14 @@
 require 'fileutils'
 require 'date'
 require 'getoptlong'
+require './helpers/helpers'
 
 include FileUtils
+include Helpers
 
-$debug = false # disable debug messages
+dlog = Debug.new
 
-# parse options into a hash
+# getlogopt option descriptions
 opt_list = [
   [ '--help',       '-h', GetoptLong::NO_ARGUMENT ],
   [ '--debug',      '-d', GetoptLong::OPTIONAL_ARGUMENT ],
@@ -19,38 +21,16 @@ usage_msg=<<-EOF.lstrip.split("\n")
     ?Usage: #{File.basename $0} [arg] [--options]
 
      options: 
-       #{opt_list.map { |opt| "#{opt[0]} (#{opt[1]})" }.join("\n       ")}
+       #{opt_list.map { |opt| "#{opt[0]} #{(opt[1].is_a?(String)) ? "(#{opt[1]})" : ""}" }.join("\n       ")}
  
      defaults:
        none currently
 
      EOF
 
-# debug logger
-def dlog(*args)
-  $stderr.puts args if $debug
-end
-
-# Put array of messages to stderr
 def err_usage(*msgs)
   $stderr.puts msgs
   exit!(false)
-end
-
-# display a separator
-def separator
-  $stdout << "----------------------------\n"
-end
-
-def nl_added
-  $stdout << "(newline added)\n"
-end
-
-# convert getoptlog return value to an option hash
-def getoptlong_to_hash(list)
-  opts = {}
-  list.each { |name, val| opts.store(name.sub(/^-*/,"").to_sym, val) }
-  opts
 end
 
 #-------------------------------------------------
@@ -58,30 +38,13 @@ end
 
 opts = getoptlong_to_hash(GetoptLong.new(*opt_list))
 
-if opts[:debug]
-   $debug = true
-   debug_level = opts[:debug].to_i
-   dlog "Debugging is enabled."
-end
+dlog.level((opts[:debug].empty?) ? 1 : opts[:debug].to_i) if opts[:debug]
 
-#-------------------------------------------------
-# debug: show current option situation
-
-dlog("options we see:")
-opts.each { |key, val| dlog "  opts[#{key}] = #{opts[key]}" }
-
-# reminder of how argv works so we can incorporate it into the command operation later
-dlog "\n#{File.basename $0} was passed:",
-     (ARGV.empty?) ? "  <no args>" : ARGV.map.with_index { |value, i| "  arg #{i}: #{value}" },
-     ""
-
-dlog "Ready to roll."
-
+dlog.arg_summary(opts)
+dlog.puts "Ready to roll."
 #-------------------------------------------------
 
 err_usage(usage_msg) if opts[:help] || opts.empty?
-
-puts "Write a program to process these arguments: #{ARGV}" 
 
 # build a string of text to use in examples, based on arg list, if present.
 text_list = (ARGV.empty?) ? %w[ A few default words from our sponsor. ] : ARGV
